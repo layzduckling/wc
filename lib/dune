@@ -1,0 +1,6 @@
+(library
+ (name ocamlwc))
+
+(ocamllex lexer)
+
+(ocamlyacc parser)
