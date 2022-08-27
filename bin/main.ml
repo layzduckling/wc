@@ -1,16 +1,11 @@
 open Ocamlwc
 open Types
 
-let file = Lexing.from_channel stdin
-let tokenizer = Lexer.pattern
-let result = Parser.file tokenizer file
-
 type info = {
   line_cnt : int;
   word_cnt : int;
   byte_cnt : int;
 }
-
 let count_characters (line : line) =
   match line with
   | Line l ->
@@ -46,17 +41,18 @@ let fake_eval (result : file) : info =
       let word_cnt, char_cnt = count_words_in_lines xs in
       { line_cnt = List.length xs; word_cnt; byte_cnt = char_cnt }
 
-let print_info { line_cnt; word_cnt; byte_cnt } =
-  print_int line_cnt;
-  print_char ' ';
-  print_int word_cnt;
-  print_char ' ';
-  print_int byte_cnt
-
+let string_of_info { line_cnt; word_cnt; byte_cnt } =
+  string_of_int line_cnt ^ " " ^string_of_int word_cnt ^ " " ^ string_of_int byte_cnt
+(* 
 let () =
   print_info (fake_eval result);
-  print_newline ()
-
+  print_newline () *)
+let process content =
+  let file = Lexing.from_string content in
+  let tokenizer = Lexer.pattern in
+  let result = Parser.file tokenizer file in
+  string_of_info (fake_eval result)
+  
 open Dream
 
 let () =
@@ -65,7 +61,7 @@ let () =
       (get "/" @@ fun request -> html (Template.upload request));
       ( post "/" @@ fun request ->
         match%lwt multipart request with
-        | `Ok [ ("files", files) ] -> html (Template.report files)
+        | `Ok [ ("files", files) ] -> html (Template.report files process)
         | _ -> empty `Bad_Request );
     ]
   |> logger |> memory_sessions

@@ -24,7 +24,7 @@
 //   | sum TIMES sum { Sum.(Prod ($1, $3)) }
 
 file:
-    EOF { Types.(File []) }
+     { Types.(File []) }
     | line file { Types.(line_file $1 $2) }
 
 line:

@@ -18,7 +18,7 @@ let upload request =
   </body>
   </html>
 
-let report files =
+let report files process =
   <html>
   <%s! head %>
   <body>
@@ -29,7 +29,7 @@ let report files =
 %         | None -> "None"
 %         | Some name -> name
 %       in
-        <li><%s name %><br><%i String.length content %> B</li>
+        <li><%s name %><br><%s process content %></li>
 %     );
   </ol>
   </body>
