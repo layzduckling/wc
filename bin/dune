@@ -1,4 +1,11 @@
 (executable
  (public_name ocamlwc)
  (name main)
- (libraries ocamlwc))
+ (libraries ocamlwc dream)
+ (preprocess (pps lwt_ppx)))
+
+(rule
+ (targets template.ml)
+ (deps template.eml.ml)
+ (action (run dream_eml %{deps} --workspace %{workspace_root})))
+ 

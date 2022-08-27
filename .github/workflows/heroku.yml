@@ -1,0 +1,44 @@
+name: heroku
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  HEROKU_API_KEY: ${{secrets.HAT}}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup OCaml 4.14
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 4.14.x
+
+      - name: Install libev for Dream
+        run: sudo apt-get install -y libev-dev
+
+      - name: Install dependencies via OPAM
+        run: opam install dune dream lwt_ppx
+
+      - name: Build
+        run: opam exec -- dune build
+
+      - name: Move executable to deploy directory
+        run: mkdir -p deploy && cp _build/default/bin/main.exe deploy/
+
+      - name: Setup Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+          heroku plugins:install heroku-builds
+
+      - name: Deploy via Heroku
+        run: heroku builds:create --app lzduckwc
